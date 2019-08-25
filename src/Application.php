@@ -40,6 +40,8 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
      */
     public function bootstrap()
     {
+        $this->addPlugin('Migrations');
+
         // Call parent to load bootstrap from files.
         parent::bootstrap();
 
