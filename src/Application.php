@@ -70,7 +70,10 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
      */
     public function middleware($middlewareQueue)
     {
-        $authentication = new AuthenticationMiddleware($this);
+        $authentication = new AuthenticationMiddleware($this, [
+            'unauthenticatedRedirect' => Router::url('users:login'),
+            'queryParam' => 'redirect'
+        ]);
         $middlewareQueue->add($authentication);
 
         $middlewareQueue
