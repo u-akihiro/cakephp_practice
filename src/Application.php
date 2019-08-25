@@ -27,6 +27,8 @@ use Cake\Http\BaseApplication;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
 
+use Cake\Routing\Router;
+
 /**
  * Application setup class.
  *
