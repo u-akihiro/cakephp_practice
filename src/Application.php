@@ -14,6 +14,12 @@
  */
 namespace App;
 
+use Authentication\AuthenticationService;
+use Authentication\AuthenticationServiceProviderInterface;
+use Authentication\Middleware\AuthenticationMiddleware;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
 use Cake\Core\Configure;
 use Cake\Core\Exception\MissingPluginException;
 use Cake\Error\Middleware\ErrorHandlerMiddleware;
@@ -27,7 +33,7 @@ use Cake\Routing\Middleware\RoutingMiddleware;
  * This defines the bootstrapping logic and middleware layers you
  * want to use in your application.
  */
-class Application extends BaseApplication
+class Application extends BaseApplication implements AuthenticationServiceProviderInterface
 {
     /**
      * {@inheritDoc}
@@ -49,6 +55,8 @@ class Application extends BaseApplication
             $this->addPlugin(\DebugKit\Plugin::class);
         }
 
+        $this->addPlugin('Authentication');
+
         // Load more plugins here
     }
 
@@ -60,6 +68,9 @@ class Application extends BaseApplication
      */
     public function middleware($middlewareQueue)
     {
+        $authentication = new AuthenticationMiddleware($this);
+        $middlewareQueue->add($authentication);
+
         $middlewareQueue
             // Catch any exceptions in the lower layers,
             // and make an error page/response
@@ -95,5 +106,20 @@ class Application extends BaseApplication
         $this->addPlugin('Migrations');
 
         // Load more plugins here
+    }
+
+    public function getAuthenticationService(ServerRequestInterface $request, ResponseInterface $response)
+    {
+        $service = new AuthenticationService();
+        $fields = [
+            'username' => 'email',
+            'password' => 'password'
+        ];
+
+        $service->loadIdentifier('Authentication.Password', compact('fields'));
+        $service->loadAuthenticator('Authentication.Session');
+        $service->loadAuthenticator('Authentication.Form', ['fields' => $fields, '/login']);
+
+        return $service;
     }
 }
