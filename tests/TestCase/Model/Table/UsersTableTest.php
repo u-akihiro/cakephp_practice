@@ -67,7 +67,36 @@ class UsersTableTest extends TestCase
      */
     public function testValidationDefault()
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        $invalidEntities = $this->Users->newEntities([
+            [
+                'name' => '',
+                'email' => '',
+                'password' => '',
+            ],
+            [
+                'name' => 'ab',
+                'email' => 'invalidemail',
+                'password' => 'abcdefg',
+            ],
+        ]);
+        foreach ( $invalidEntities as $entity ) {
+            $errors = $entity->getErrors();
+            $this->assertArrayHasKey('name', $errors);
+            $this->assertArrayHasKey('email', $errors);
+            $this->assertArrayHasKey('password', $errors);
+        }
+
+        $validEntities = $this->Users->newEntities([
+            [
+                'name' => 'abc',
+                'email' => 'validemail@example.com',
+                'password' => 'abcdefgh',
+            ]
+        ]);
+        foreach ($validEntities as $entity) {
+            $errors = $entity->getErrors();
+            $this->assertEmpty($errors);
+        }
     }
 
     /**
@@ -77,6 +106,23 @@ class UsersTableTest extends TestCase
      */
     public function testBuildRules()
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        $notUniqueEntity = $this->Users->newEntity([
+            'name' => 'alreadyused',
+            'email' => 'already.exists@example.com',
+            'password' => 'password'
+        ]);
+        $this->assertFalse($this->Users->save($notUniqueEntity));
+        $errors = $notUniqueEntity->getErrors();
+        $this->assertArrayHasKey('name', $errors);
+        $this->assertArrayHasKey('email', $errors);
+
+        $uniqueEntity = $this->Users->newEntity([
+            'name' => 'uniquename',
+            'email' => 'unique@example.com',
+            'password' => 'password'
+        ]);
+        $this->assertInstanceOf('Cake\Datasource\EntityInterface', $this->Users->save($uniqueEntity));
+        $errors = $uniqueEntity->getErrors();
+        $this->assertEmpty($errors);
     }
 }
