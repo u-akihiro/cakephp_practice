@@ -72,11 +72,19 @@ class UsersTableTest extends TestCase
                 'name' => '',
                 'email' => '',
                 'password' => '',
+                'confirm_password' => ''
             ],
             [
                 'name' => 'ab',
                 'email' => 'invalidemail',
                 'password' => 'abcdefg',
+                'confirm_password' => ''
+            ],
+            [
+                'name' => 'ab',
+                'email' => 'invalidemail',
+                'password' => 'passwor',
+                'confirm_password' => 'rowssap'
             ],
         ]);
         foreach ( $invalidEntities as $entity ) {
@@ -84,6 +92,7 @@ class UsersTableTest extends TestCase
             $this->assertArrayHasKey('name', $errors);
             $this->assertArrayHasKey('email', $errors);
             $this->assertArrayHasKey('password', $errors);
+            $this->assertArrayHasKey('confirm_password', $errors);
         }
 
         $validEntities = $this->Users->newEntities([

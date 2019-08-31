@@ -69,6 +69,12 @@ class UsersTable extends Table
             ->maxLength('password', 255)
             ->requirePresence('password', 'create')
             ->notEmptyString('password');
+        
+        $validator
+            ->add('confirm_password', 'no_misspelling', [
+                'rule' => ['compareWith', 'password'],
+                'message' => 'パスワードが一致しません'
+            ]);
 
         return $validator;
     }
